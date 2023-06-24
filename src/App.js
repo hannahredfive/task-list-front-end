@@ -35,9 +35,9 @@ const App = () => {
       });
   };
 
-  const markTaskIncomplete = (taskID) => {
+  const updateTaskDBStatus = (taskID, completeStatus) => {
     axios
-    .patch(URL_PREFIX + `/tasks/${taskID}/mark_incomplete`)
+    .patch(URL_PREFIX + `/tasks/${taskID}/mark_${completeStatus}`)
     .then(() => {
       const updatedTasks = tasks.map(task => {
         if (task.id === taskID) {
@@ -48,24 +48,7 @@ const App = () => {
       setTasks(updatedTasks);
     })
     .catch((error) => {
-      console.log('could not mark task as incomplete', error);
-    });
-  };
-
-  const markTaskComplete = (taskID) => {
-    axios
-    .patch(URL_PREFIX + `/tasks/${taskID}/mark_complete`)
-    .then(() => {
-      const updatedTasks = tasks.map(task => {
-        if (task.id === taskID) {
-          return { ...task, isComplete: !task.isComplete };
-        }
-        return task;
-      });    
-      setTasks(updatedTasks);
-    })
-    .catch((error) => {
-      console.log('could not mark task as complete', error);
+      console.log(`could not mark task as ${completeStatus}`, error);
     });
   };
   
@@ -78,10 +61,10 @@ const App = () => {
       if (task.id === taskID) {
         if (task.isComplete === true) {
           // if task is currently complete, mark as incomplete
-          markTaskIncomplete(taskID);
+          updateTaskDBStatus(taskID, 'incomplete');
         } else {
           // if task is currently incomplete, mark as complete
-          markTaskComplete(taskID);
+          updateTaskDBStatus(taskID, 'complete');
         }
       }
     });
