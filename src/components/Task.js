@@ -11,7 +11,7 @@ const Task = (props) => {
     console.log("Hello i'm inside toggleComplete!");
     setComplete(!complete);
     props.updateTaskStatus(props.id);
-  }
+  };
 
 
   return (

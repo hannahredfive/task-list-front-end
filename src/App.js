@@ -18,7 +18,7 @@ const TASKS = [
 
 const App = () => {
   const [tasks, setTasks] = useState(TASKS);
-  const URL_PREFIX = 'https://task-list-api-c17.onrender.com/'
+  const URL_PREFIX = 'https://task-list-api-c17.onrender.com/';
 
   const loadTasks = () => {
     axios
@@ -35,22 +35,58 @@ const App = () => {
       });
   };
 
+  const markTaskIncomplete = (taskID) => {
+    axios
+    .patch(URL_PREFIX + `/tasks/${taskID}/mark_incomplete`)
+    .then(() => {
+      loadTasks();
+    })
+    .catch((error) => {
+      console.log('error', error);
+    });
+  };
+
+  const markTaskComplete = (taskID) => {
+    axios
+    .patch(URL_PREFIX + `/tasks/${taskID}/mark_complete`)
+    .then(() => {
+      loadTasks();
+    })
+    .catch((error) => {
+      console.log('error', error);
+    });
+  };
+  
   useEffect( () => {
     loadTasks();
   }, []);
-
+  
   const updateTaskStatus = (taskID) => {
-    //console.log('hellllloooo im inside  update4TaskStatus');
-    const updatedTasks = tasks.map(task => {
-    if (task.id === taskID) {
-        return { ...task, isComplete: !task.isComplete };
-        //task.isComplete = !task.isComplete;
+    tasks.forEach((task) => {
+      if (task.id === taskID) {
+        if (task.isComplete) {
+          // if task is currently complete, mark as incomplete
+          markTaskIncomplete(taskID);
+        } else {
+          // if task is currently incomplete, mark as complete
+          markTaskComplete(taskID);
+        }
       }
-      return task;
     });
-
-    setTasks(updatedTasks);
+    
   };
+
+  // const updateTaskStatus = (taskID) => {
+  //   //console.log('hellllloooo im inside  update4TaskStatus');
+  //   const updatedTasks = tasks.map(task => {
+  //     if (task.id === taskID) {
+  //       return { ...task, isComplete: !task.isComplete };
+  //     }
+  //     return task;
+  //   });
+
+  //   setTasks(updatedTasks);
+  // };
 
   const deleteTask = (taskID) => {
     const updatedTasks = tasks.map(task => {
