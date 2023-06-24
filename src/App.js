@@ -31,7 +31,7 @@ const App = () => {
         setTasks(initialTaskData);
       })
       .catch((error) => {
-        console.log('error', error);
+        console.log('Could not load tasks from the database', error);
       });
   };
 
@@ -86,7 +86,7 @@ const App = () => {
       })
       .catch((error) => {
         // if it's not successful, print out error details for now
-        console.log('could not delete task', error, error.response);
+        console.log(`could not delete task #${taskID}`, error, error.response);
       });
   };
 
