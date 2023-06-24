@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
+import NewTaskForm from './components/NewTaskForm.js';
 import './App.css';
 import axios, {isCancel, AxiosError} from 'axios';
 
@@ -18,11 +19,11 @@ const TASKS = [
 
 const App = () => {
   const [tasks, setTasks] = useState(TASKS);
-  const URL_PREFIX = 'https://task-list-api-c17.onrender.com/';
+  const URL_PREFIX = 'https://task-list-api-c17.onrender.com';
 
   const loadTasks = () => {
     axios
-      .get(URL_PREFIX + '/tasks')
+      .get(`${URL_PREFIX}/tasks`)
       .then((response) => {
         const initialTaskData = [];
         response.data.forEach((task) => {
@@ -37,7 +38,7 @@ const App = () => {
 
   const updateTaskDBStatus = (taskID, completeStatus) => {
     axios
-    .patch(URL_PREFIX + `/tasks/${taskID}/mark_${completeStatus}`)
+    .patch(`${URL_PREFIX}/tasks/${taskID}/mark_${completeStatus}`)
     .then(() => {
       const updatedTasks = tasks.map(task => {
         if (task.id === taskID) {
@@ -90,13 +91,43 @@ const App = () => {
       });
   };
 
+  const createNewTask = (newTaskInfo) => {
+    // add sanctuary_id as a key so flask doesn't freak out 
+    const updateNewTaskInfo = {
+      ...newTaskInfo
+    };
+
+    axios
+      .post(`${URL_PREFIX}/tasks`, updateNewTaskInfo)
+      .then(() => {
+        // update the Tasks state to refresh the page
+        const newTasksArray = [...tasks];
+        newTasksArray.push(newTaskInfo);
+        setTasks(newTasksArray);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }; 
+
   return (
     <div className="App">
       <header className="App-header">
         <h1>Ada&apos;s Task List</h1>
       </header>
       <main>
-        <div><TaskList tasks={tasks} updateTaskStatus={updateTaskStatus} deleteTask={deleteTask} /></div>
+        <div>
+          <NewTaskForm 
+            createNewTask={createNewTask}
+          />
+        </div>
+        <div>
+          <TaskList 
+            tasks={tasks} 
+            updateTaskStatus={updateTaskStatus} 
+            deleteTask={deleteTask} 
+          />
+        </div>
       </main>
     </div>
   );
