@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TaskList from './components/TaskList.js';
 import './App.css';
+import axios, {isCancel, AxiosError} from 'axios';
 
 const TASKS = [
   {
@@ -15,23 +16,28 @@ const TASKS = [
   },
 ];
 
-// const updateDelete = (animalId) => {
-//   const updatedAnimals = animals.map(animal => {
-//     if (animal.id !== animalId) {
-//       return { ...animal };
-//     }
-//   });
-
-//   // taken from https://stackoverflow.com/questions/28607451/removing-undefined-values-from-array
-//   const filteredUpdatedData = updatedAnimals.filter(function (element) {
-//     return element !== undefined;
-//   });
-
-//   setAnimals(filteredUpdatedData);
-// }
-
 const App = () => {
   const [tasks, setTasks] = useState(TASKS);
+  const URL_PREFIX = 'https://task-list-api-c17.onrender.com/'
+
+  const loadTasks = () => {
+    axios
+      .get(URL_PREFIX + '/tasks')
+      .then((response) => {
+        const initialTaskData = [];
+        response.data.forEach((task) => {
+          initialTaskData.push(task);
+        });
+        setTasks(initialTaskData);
+      })
+      .catch((error) => {
+        console.log('error', error);
+      });
+  };
+
+  useEffect( () => {
+    loadTasks();
+  }, []);
 
   const updateTaskStatus = (taskID) => {
     //console.log('hellllloooo im inside  update4TaskStatus');
@@ -45,6 +51,7 @@ const App = () => {
 
     setTasks(updatedTasks);
   };
+
   const deleteTask = (taskID) => {
     const updatedTasks = tasks.map(task => {
       if (task.id !== taskID) {
