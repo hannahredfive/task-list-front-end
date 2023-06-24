@@ -39,10 +39,16 @@ const App = () => {
     axios
     .patch(URL_PREFIX + `/tasks/${taskID}/mark_incomplete`)
     .then(() => {
-      loadTasks();
+      const updatedTasks = tasks.map(task => {
+        if (task.id === taskID) {
+          return { ...task, isComplete: !task.isComplete };
+        }
+        return task;
+      });    
+      setTasks(updatedTasks);
     })
     .catch((error) => {
-      console.log('error', error);
+      console.log('could not mark task as incomplete', error);
     });
   };
 
@@ -50,10 +56,16 @@ const App = () => {
     axios
     .patch(URL_PREFIX + `/tasks/${taskID}/mark_complete`)
     .then(() => {
-      loadTasks();
+      const updatedTasks = tasks.map(task => {
+        if (task.id === taskID) {
+          return { ...task, isComplete: !task.isComplete };
+        }
+        return task;
+      });    
+      setTasks(updatedTasks);
     })
     .catch((error) => {
-      console.log('error', error);
+      console.log('could not mark task as complete', error);
     });
   };
   
@@ -64,7 +76,7 @@ const App = () => {
   const updateTaskStatus = (taskID) => {
     tasks.forEach((task) => {
       if (task.id === taskID) {
-        if (task.isComplete) {
+        if (task.isComplete === true) {
           // if task is currently complete, mark as incomplete
           markTaskIncomplete(taskID);
         } else {
@@ -76,32 +88,24 @@ const App = () => {
     
   };
 
-  // const updateTaskStatus = (taskID) => {
-  //   //console.log('hellllloooo im inside  update4TaskStatus');
-  //   const updatedTasks = tasks.map(task => {
-  //     if (task.id === taskID) {
-  //       return { ...task, isComplete: !task.isComplete };
-  //     }
-  //     return task;
-  //   });
-
-  //   setTasks(updatedTasks);
-  // };
-
   const deleteTask = (taskID) => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id !== taskID) {
-        return task;
-      }
-    });
-  
-    const filteredUpdatedData = updatedTasks.filter (function (element) {
-      return element !== undefined;
-    });
-
-    setTasks(filteredUpdatedData);
+    axios.delete(`${URL_PREFIX}/tasks/${taskID}`)
+      .then((response) => {
+        const updatedTasks = tasks.map(task => {
+          if (task.id !== taskID) {
+            return task;
+          }
+        });
+        const filteredUpdatedData = updatedTasks.filter (function (element) {
+          return element !== undefined;
+        });
+        setTasks(filteredUpdatedData);
+      })
+      .catch((error) => {
+        // if it's not successful, print out error details for now
+        console.log('could not delete task', error, error.response);
+      });
   };
-
 
   return (
     <div className="App">
